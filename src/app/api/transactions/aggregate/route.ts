@@ -63,7 +63,7 @@ function aggregateTransactions(
   console.log("🚀 ~ startDate:", startDate);
 
   const dailyAggregates: { [date: string]: AggregateDataType } = {};
-
+  console.log("시간 확인", new Date(transactions[0].timestamp));
   transactions.forEach((transaction) => {
     const transactionDate = new Date(transaction.timestamp);
 
