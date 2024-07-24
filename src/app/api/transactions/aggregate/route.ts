@@ -6,6 +6,10 @@ import {
   AggregateType,
   TransactionDataType,
 } from "@/services/transactions";
+import { parseISO, startOfDay, endOfDay, subDays, subMonths } from "date-fns";
+import { formatInTimeZone, getTimezoneOffset } from "date-fns-tz";
+
+const TIME_ZONE = "Asia/Seoul";
 
 async function readTransactions(): Promise<TransactionDataType[]> {
   const filePath = path.join(
@@ -21,20 +25,18 @@ function getDateRange(period: AggregateType): {
   startDate: Date;
   endDate: Date;
 } {
-  const endDate = new Date();
-  endDate.setDate(endDate.getDate() - 1);
-  endDate.setHours(23, 59, 59, 999);
+  const now = new Date();
+  const endDate = endOfDay(subDays(now, 1));
 
-  const startDate = new Date(endDate);
-
+  let startDate: Date;
   if (period === "Week") {
-    // 어제를 포함한 7일
-    startDate.setDate(endDate.getDate() - 6);
+    startDate = startOfDay(subDays(endDate, 6));
   } else if (period === "Month") {
-    startDate.setMonth(endDate.getMonth() - 1);
-    startDate.setDate(startDate.getDate() + 1);
+    startDate = startOfDay(subMonths(endDate, 1));
+  } else {
+    throw new Error("Invalid period");
   }
-  startDate.setHours(0, 0, 0, 0);
+
   return { startDate, endDate };
 }
 
@@ -42,13 +44,8 @@ function formatNumber(num: number): number {
   return Number(num.toFixed(2));
 }
 
-function convertToKST(date: Date): Date {
-  return new Date(date.getTime() + 9 * 60 * 60 * 1000);
-}
-
 function formatToKSTDate(date: Date): string {
-  const kstDate = convertToKST(date);
-  return kstDate.toISOString().split("T")[0];
+  return formatInTimeZone(date, TIME_ZONE, "yyyy-MM-dd");
 }
 
 function aggregateTransactions(
@@ -56,21 +53,16 @@ function aggregateTransactions(
   period: AggregateType,
 ): AggregateDataType[] {
   const { startDate, endDate } = getDateRange(period);
+  const timezoneOffset = getTimezoneOffset(TIME_ZONE);
 
   const dailyAggregates: { [date: string]: AggregateDataType } = {};
 
-  const kstStartDate = convertToKST(startDate);
-  const kstEndDate = convertToKST(endDate);
-
   transactions.forEach((transaction) => {
-    const transactionDate = new Date(transaction.timestamp);
-    const kstTransactionDate = convertToKST(transactionDate);
+    const transactionDate = parseISO(transaction.timestamp);
+    const kstDate = new Date(transactionDate.getTime() + timezoneOffset);
 
-    if (
-      kstTransactionDate >= kstStartDate &&
-      kstTransactionDate <= kstEndDate
-    ) {
-      const date = formatToKSTDate(transactionDate);
+    if (kstDate >= startDate && kstDate <= endDate) {
+      const date = formatToKSTDate(kstDate);
       const amount = parseFloat(transaction.amount);
 
       if (!dailyAggregates[date]) {
@@ -91,7 +83,7 @@ function aggregateTransactions(
       income: formatNumber(aggregate.income),
       expense: formatNumber(aggregate.expense),
     }))
-    .sort((a, b) => b.date.localeCompare(a.date));
+    .sort((a, b) => a.date.localeCompare(b.date));
 }
 
 export async function GET(request: NextRequest) {

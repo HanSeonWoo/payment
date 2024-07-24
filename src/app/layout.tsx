@@ -4,6 +4,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import StatusBar from "@/components/StatusBar";
 import ReactQueryProvider from "@/providers/ReactQueryProvider";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -32,6 +33,7 @@ export default function RootLayout({
           <StatusBar />
           {children}
         </ReactQueryProvider>
+        <Toaster />
       </body>
     </html>
   );
