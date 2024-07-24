@@ -31,29 +31,36 @@ export default function RecentTransactions() {
       Math.random().toString(36).substr(2, 9);
     localStorage.setItem("clientId", clientId);
 
-    const eventSource = new EventSource(
-      `/api/transactions/recent?sse=true&clientId=${clientId}`,
-    );
-    ``;
+    let eventSource: EventSource;
 
-    eventSource.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.hasNewData) {
-        refetch();
-        toast({
-          title: "새로운 입출금 내역이 있습니다!",
-          description: "Friday, February 10, 2023 at 5:57 PM",
-        });
-      }
+    const connectSSE = () => {
+      eventSource = new EventSource(
+        `/api/transactions/recent?sse=true&clientId=${clientId}`,
+      );
+
+      eventSource.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.hasNewData) {
+          refetch();
+          toast({
+            title: "새로운 입출금 내역이 있습니다!",
+          });
+        }
+      };
+
+      eventSource.onerror = (error) => {
+        console.error("SSE error:", error);
+        eventSource.close();
+        setTimeout(connectSSE, 5000); // 5초 후 재연결 시도
+      };
     };
 
-    eventSource.onerror = (error) => {
-      console.error("SSE error:", error);
-      eventSource.close();
-    };
+    connectSSE();
 
     return () => {
-      eventSource.close();
+      if (eventSource) {
+        eventSource.close();
+      }
     };
   }, [refetch, toast]);
 
