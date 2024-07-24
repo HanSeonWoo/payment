@@ -54,7 +54,10 @@ export async function GET(request: NextRequest) {
     const count = parseInt(searchParams.get("count") || "10");
     const clientId = searchParams.get("clientId"); // 클라이언트 ID를 쿼리 파라미터로 받음
 
+    console.log("가자아", searchParams);
+
     if (searchParams.get("sse") === "true" && clientId) {
+      console.log("get if문 안에 들어옴.");
       const stream = new ReadableStream({
         start(controller) {
           clients.set(clientId, { controller, lastKnownTransaction: null });
@@ -63,6 +66,7 @@ export async function GET(request: NextRequest) {
           });
         },
       });
+      console.log("🚀 ~ GET ~ stream:", stream);
 
       return new Response(stream, {
         headers: {
