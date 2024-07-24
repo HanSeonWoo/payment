@@ -6,7 +6,14 @@ import {
   AggregateType,
   TransactionDataType,
 } from "@/services/transactions";
-import { parseISO, startOfDay, endOfDay, subDays, subMonths } from "date-fns";
+import {
+  parseISO,
+  startOfDay,
+  endOfDay,
+  subDays,
+  subMonths,
+  isWithinInterval,
+} from "date-fns";
 import { formatInTimeZone, getTimezoneOffset } from "date-fns-tz";
 
 const TIME_ZONE = "Asia/Seoul";
@@ -27,7 +34,6 @@ function getDateRange(period: AggregateType): {
 } {
   const now = new Date();
   const endDate = endOfDay(subDays(now, 1));
-
   let startDate: Date;
   if (period === "Week") {
     startDate = startOfDay(subDays(endDate, 6));
@@ -53,16 +59,16 @@ function aggregateTransactions(
   period: AggregateType,
 ): AggregateDataType[] {
   const { startDate, endDate } = getDateRange(period);
-  const timezoneOffset = getTimezoneOffset(TIME_ZONE);
+  console.log("🚀 ~ endDate:", endDate);
+  console.log("🚀 ~ startDate:", startDate);
 
   const dailyAggregates: { [date: string]: AggregateDataType } = {};
 
   transactions.forEach((transaction) => {
-    const transactionDate = parseISO(transaction.timestamp);
-    const kstDate = new Date(transactionDate.getTime() + timezoneOffset);
+    const transactionDate = new Date(transaction.timestamp);
 
-    if (kstDate >= startDate && kstDate <= endDate) {
-      const date = formatToKSTDate(kstDate);
+    if (isWithinInterval(transactionDate, { start: startDate, end: endDate })) {
+      const date = formatToKSTDate(transactionDate);
       const amount = parseFloat(transaction.amount);
 
       if (!dailyAggregates[date]) {
