@@ -3,6 +3,8 @@ import fs from "fs/promises";
 import path from "path";
 import { TransactionDataType, TransactionType } from "@/services/transactions";
 
+export const maxDuration = 60;
+
 interface Client {
   controller: ReadableStreamDefaultController;
   lastKnownTransaction: TransactionDataType | null;
