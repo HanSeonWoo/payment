@@ -69,14 +69,18 @@ function aggregateTransactions(
 
     if (isWithinInterval(transactionDate, { start: startDate, end: endDate })) {
       const date = formatToKSTDate(transactionDate);
-      console.log(
-        "🚀 ~ transactions.forEach ~ transactionDate:",
-        transactionDate,
-      );
-      console.log("🚀 ~ transactions.forEach ~ date:", date);
       const amount = parseFloat(transaction.amount);
 
       if (!dailyAggregates[date]) {
+        console.log(
+          "🚀 ~ transactions.forEach ~ dailyAggregates[date]:",
+          dailyAggregates[date],
+        );
+        console.log(
+          "🚀 ~ transactions.forEach ~ transactionDate:",
+          transactionDate,
+        );
+        console.log("🚀 ~ transactions.forEach ~ date:", date);
         dailyAggregates[date] = { date, income: 0, expense: 0 };
       }
 
