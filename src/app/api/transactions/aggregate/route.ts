@@ -73,15 +73,15 @@ function aggregateTransactions(
 
       if (!dailyAggregates[date]) {
         console.log(
-          "🚀 ~ transactions.forEach ~ dailyAggregates[date]:",
-          dailyAggregates[date],
-        );
-        console.log(
           "🚀 ~ transactions.forEach ~ transactionDate:",
           transactionDate,
         );
         console.log("🚀 ~ transactions.forEach ~ date:", date);
         dailyAggregates[date] = { date, income: 0, expense: 0 };
+        console.log(
+          "🚀 ~ transactions.forEach ~ dailyAggregates",
+          dailyAggregates,
+        );
       }
 
       if (amount >= 0) {
