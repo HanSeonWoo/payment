@@ -50,7 +50,10 @@ function getDateRange(period: AggregateType): {
     throw new Error("Invalid period");
   }
 
-  return { startDate, endDate };
+  return {
+    startDate: toZonedTime(startDate, TIME_ZONE),
+    endDate: toZonedTime(endDate, TIME_ZONE),
+  };
 }
 
 function formatNumber(num: number): number {
