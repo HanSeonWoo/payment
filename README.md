@@ -37,11 +37,11 @@
 
 ### 입출금 애니메이션 & 토스트메시지 효과
 
-<img src="https://github.com/user-attachments/assets/4d60f008-886e-43ba-887a-da44eecd5811">
+<img width="360" src="https://github.com/user-attachments/assets/4d60f008-886e-43ba-887a-da44eecd5811">
 
 ### 로딩 시 스켈레톤 효과 적용
 
-<img src="https://github.com/user-attachments/assets/2a8416f2-677c-4416-85e7-8e398ffa04c1">
+<img width="360" src="https://github.com/user-attachments/assets/2a8416f2-677c-4416-85e7-8e398ffa04c1">
 
 ### 시간 계산 로직
 
