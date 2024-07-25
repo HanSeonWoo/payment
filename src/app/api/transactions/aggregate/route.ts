@@ -40,7 +40,7 @@ function getDateRange(period: AggregateType): {
   const localTime = toZonedTime(now, localTimeZone);
   console.log("🚀 ~ getDateRange ~ localTime:", localTime);
 
-  const endDate = endOfDay(subDays(localTime, 1));
+  const endDate = endOfDay(subDays(now, 1));
   let startDate: Date;
   if (period === "Week") {
     startDate = startOfDay(subDays(endDate, 6));
