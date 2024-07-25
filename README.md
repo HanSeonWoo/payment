@@ -35,6 +35,14 @@
 
 ## 구현 상세
 
+### 입출금 애니메이션 & 토스트메시지 효과
+
+<img src="https://github.com/user-attachments/assets/4d60f008-886e-43ba-887a-da44eecd5811">
+
+### 로딩 시 스켈레톤 효과 적용
+
+<img src="https://github.com/user-attachments/assets/2a8416f2-677c-4416-85e7-8e398ffa04c1">
+
 ### 시간 계산 로직
 
 UTC기준으로 저장된 mock data의 timestamp에서 시간 단위를 맞추기 위해서 계산하는 로직을 추가했습니다.
