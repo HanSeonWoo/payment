@@ -3,7 +3,7 @@ import fs from "fs/promises";
 import path from "path";
 import { TransactionDataType, TransactionType } from "@/services/transactions";
 
-export const maxDuration = 60;
+export const maxDuration = 20;
 
 interface Client {
   controller: ReadableStreamDefaultController;

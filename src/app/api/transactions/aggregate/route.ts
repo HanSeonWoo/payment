@@ -65,8 +65,6 @@ function aggregateTransactions(
   period: AggregateType,
 ): AggregateDataType[] {
   const { startDate, endDate } = getDateRange(period);
-  console.log("🚀 ~ endDate:", endDate);
-  console.log("🚀 ~ startDate:", startDate);
 
   const dailyAggregates: { [date: string]: AggregateDataType } = {};
   transactions.forEach((transaction) => {
@@ -77,11 +75,6 @@ function aggregateTransactions(
       const amount = parseFloat(transaction.amount);
 
       if (!dailyAggregates[date]) {
-        console.log(
-          "🚀 ~ transactions.forEach ~ transactionDate:",
-          transactionDate,
-        );
-        console.log("🚀 ~ transactions.forEach ~ date:", date);
         dailyAggregates[date] = { date, income: 0, expense: 0 };
       }
 
