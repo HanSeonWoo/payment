@@ -33,7 +33,9 @@ function getDateRange(period: AggregateType): {
   endDate: Date;
 } {
   const now = new Date();
+  console.log("🚀 ~ getDateRange ~ now:", now);
   const koreaTime = toZonedTime(now, TIME_ZONE);
+  console.log("🚀 ~ getDateRange ~ koreaTime:", koreaTime);
 
   const endDate = endOfDay(subDays(koreaTime, 1));
   let startDate: Date;
