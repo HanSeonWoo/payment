@@ -14,7 +14,7 @@ import {
   subMonths,
   isWithinInterval,
 } from "date-fns";
-import { formatInTimeZone, getTimezoneOffset } from "date-fns-tz";
+import { formatInTimeZone, getTimezoneOffset, toZonedTime } from "date-fns-tz";
 
 const TIME_ZONE = "Asia/Seoul";
 
@@ -33,7 +33,9 @@ function getDateRange(period: AggregateType): {
   endDate: Date;
 } {
   const now = new Date();
-  const endDate = endOfDay(subDays(now, 1));
+  const koreaTime = toZonedTime(now, TIME_ZONE);
+
+  const endDate = endOfDay(subDays(koreaTime, 1));
   let startDate: Date;
   if (period === "Week") {
     startDate = startOfDay(subDays(endDate, 6));
