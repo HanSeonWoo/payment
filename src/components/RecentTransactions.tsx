@@ -2,19 +2,25 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   fetchRecentTransactions,
   TRANSACTION_TYPES,
+  TransactionDataType,
   TransactionType,
 } from "@/services/transactions";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import TransactionItem from "./TransactionItem";
 import TransactionLoading from "./TransactionLoading";
 import { useToast } from "@/components/ui/use-toast";
+
+const POLLING_INTERVAL = 60 * 1000; // 60초마다 폴링
 
 export default function RecentTransactions() {
   const [transactionType, setTransactionType] = useState<TransactionType>(
     TRANSACTION_TYPES[0],
   );
   const { toast } = useToast();
+  const [usePolling, setUsePolling] = useState(false);
+  const eventSourceRef = useRef<EventSource | null>(null);
+  const previousDataRef = useRef<TransactionDataType[] | null>(null);
 
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["recent", transactionType, transactionType === "All" ? 20 : 10],
@@ -23,7 +29,28 @@ export default function RecentTransactions() {
         queryKey[1] as TransactionType,
         queryKey[2] as number,
       ),
+    refetchInterval: usePolling ? POLLING_INTERVAL : false,
   });
+
+  useEffect(() => {
+    if (data && previousDataRef.current) {
+      const hasNewData = data.some(
+        (newItem) =>
+          !previousDataRef.current!.some(
+            (oldItem) =>
+              oldItem.timestamp === newItem.timestamp &&
+              oldItem.name === newItem.name,
+          ),
+      );
+
+      if (hasNewData) {
+        toast({
+          title: "새로운 입출금 내역이 있습니다!",
+        });
+      }
+    }
+    previousDataRef.current = data || null;
+  }, [data, toast]);
 
   useEffect(() => {
     const clientId =
@@ -31,10 +58,12 @@ export default function RecentTransactions() {
       Math.random().toString(36).substr(2, 9);
     localStorage.setItem("clientId", clientId);
 
-    let eventSource: EventSource;
-
     const connectSSE = () => {
-      eventSource = new EventSource(
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+      }
+
+      const eventSource = new EventSource(
         `/api/transactions/recent?sse=true&clientId=${clientId}`,
       );
 
@@ -42,28 +71,28 @@ export default function RecentTransactions() {
         const data = JSON.parse(event.data);
         if (data.hasNewData) {
           refetch();
-          toast({
-            title: "새로운 입출금 내역이 있습니다!",
-          });
         }
       };
 
       eventSource.onerror = (error) => {
         console.error("SSE error:", error);
         eventSource.close();
-        setTimeout(connectSSE, 5000); // 5초 후 재연결 시도
+        setUsePolling(true);
       };
+
+      eventSourceRef.current = eventSource;
     };
 
-    connectSSE();
+    if (!usePolling) {
+      connectSSE();
+    }
 
     return () => {
-      if (eventSource) {
-        eventSource.close();
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
       }
     };
-  }, [refetch, toast]);
-
+  }, [refetch, toast, usePolling]);
   return (
     <div className="px-5">
       <div className="p-4">
