@@ -51,8 +51,8 @@ function getDateRange(period: AggregateType): {
   }
 
   return {
-    startDate: toZonedTime(startDate, TIME_ZONE),
-    endDate: toZonedTime(endDate, TIME_ZONE),
+    startDate,
+    endDate,
   };
 }
 
@@ -73,9 +73,11 @@ function aggregateTransactions(
   console.log("🚀 ~ startDate:", startDate);
 
   const dailyAggregates: { [date: string]: AggregateDataType } = {};
-  console.log("시간 확인", new Date(transactions[0].timestamp));
   transactions.forEach((transaction) => {
-    const transactionDate = new Date(transaction.timestamp);
+    const transactionDate = toZonedTime(
+      new Date(transaction.timestamp),
+      TIME_ZONE,
+    );
 
     if (isWithinInterval(transactionDate, { start: startDate, end: endDate })) {
       const date = formatToKSTDate(transactionDate);
