@@ -35,11 +35,7 @@ function getDateRange(period: AggregateType): {
 } {
   const now = new Date();
   const localTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  console.log("Your local time zone is:", localTimeZone);
-  const offset = getTimezoneOffset(TIME_ZONE);
-  console.log("🚀 ~ getDateRange ~ now:", now);
   const localTime = toZonedTime(now, TIME_ZONE);
-  console.log("🚀 ~ getDateRange ~ localTime:", localTime);
 
   const endDate = endOfDay(subDays(localTime, 1));
   let startDate: Date;
@@ -51,8 +47,8 @@ function getDateRange(period: AggregateType): {
     throw new Error("Invalid period");
   }
   return {
-    startDate: localTimeZone === "UTC" ? addHours(startDate, 9) : startDate,
-    endDate: localTimeZone === "UTC" ? addHours(endDate, 9) : endDate,
+    startDate: localTimeZone === "UTC" ? addHours(startDate, -9) : startDate,
+    endDate: localTimeZone === "UTC" ? addHours(endDate, -9) : endDate,
   };
 }
 
