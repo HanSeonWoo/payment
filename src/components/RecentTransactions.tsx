@@ -21,6 +21,7 @@ export default function RecentTransactions() {
   const [usePolling, setUsePolling] = useState(false);
   const eventSourceRef = useRef<EventSource | null>(null);
   const previousDataRef = useRef<TransactionDataType[] | null>(null);
+  const previousTypeRef = useRef<TransactionType>(transactionType);
 
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["recent", transactionType, transactionType === "All" ? 20 : 10],
@@ -34,23 +35,28 @@ export default function RecentTransactions() {
 
   useEffect(() => {
     if (data && previousDataRef.current) {
-      const hasNewData = data.some(
-        (newItem) =>
-          !previousDataRef.current!.some(
-            (oldItem) =>
-              oldItem.timestamp === newItem.timestamp &&
-              oldItem.name === newItem.name,
-          ),
-      );
+      const typeChanged = previousTypeRef.current !== transactionType;
 
-      if (hasNewData) {
-        toast({
-          title: "새로운 입출금 내역이 있습니다!",
-        });
+      if (!typeChanged) {
+        const hasNewData = data.some(
+          (newItem) =>
+            !previousDataRef.current!.some(
+              (oldItem) =>
+                oldItem.timestamp === newItem.timestamp &&
+                oldItem.name === newItem.name,
+            ),
+        );
+
+        if (hasNewData) {
+          toast({
+            title: "새로운 입출금 내역이 있습니다!",
+          });
+        }
       }
     }
     previousDataRef.current = data || null;
-  }, [data, toast]);
+    previousTypeRef.current = transactionType;
+  }, [data, toast, transactionType]);
 
   useEffect(() => {
     const clientId =

@@ -33,11 +33,14 @@ function getDateRange(period: AggregateType): {
   endDate: Date;
 } {
   const now = new Date();
-  console.log("🚀 ~ getDateRange ~ now:", now);
-  const koreaTime = toZonedTime(now, TIME_ZONE);
-  console.log("🚀 ~ getDateRange ~ koreaTime:", koreaTime);
+  const localTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  console.log("Your local time zone is:", localTimeZone);
 
-  const endDate = endOfDay(subDays(koreaTime, 1));
+  console.log("🚀 ~ getDateRange ~ now:", now);
+  const localTime = toZonedTime(now, localTimeZone);
+  console.log("🚀 ~ getDateRange ~ localTime:", localTime);
+
+  const endDate = endOfDay(subDays(localTime, 1));
   let startDate: Date;
   if (period === "Week") {
     startDate = startOfDay(subDays(endDate, 6));
@@ -82,10 +85,6 @@ function aggregateTransactions(
         );
         console.log("🚀 ~ transactions.forEach ~ date:", date);
         dailyAggregates[date] = { date, income: 0, expense: 0 };
-        console.log(
-          "🚀 ~ transactions.forEach ~ dailyAggregates",
-          dailyAggregates,
-        );
       }
 
       if (amount >= 0) {
