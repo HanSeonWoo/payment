@@ -13,6 +13,7 @@ import {
   subDays,
   subMonths,
   isWithinInterval,
+  addHours,
 } from "date-fns";
 import { formatInTimeZone, getTimezoneOffset, toZonedTime } from "date-fns-tz";
 
@@ -35,12 +36,12 @@ function getDateRange(period: AggregateType): {
   const now = new Date();
   const localTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   console.log("Your local time zone is:", localTimeZone);
-
+  const offset = getTimezoneOffset(TIME_ZONE);
   console.log("🚀 ~ getDateRange ~ now:", now);
-  const localTime = toZonedTime(now, localTimeZone);
+  const localTime = toZonedTime(now, TIME_ZONE);
   console.log("🚀 ~ getDateRange ~ localTime:", localTime);
 
-  const endDate = endOfDay(subDays(now, 1));
+  const endDate = endOfDay(subDays(localTime, 1));
   let startDate: Date;
   if (period === "Week") {
     startDate = startOfDay(subDays(endDate, 6));
@@ -49,10 +50,9 @@ function getDateRange(period: AggregateType): {
   } else {
     throw new Error("Invalid period");
   }
-
   return {
-    startDate,
-    endDate,
+    startDate: localTimeZone === "UTC" ? addHours(startDate, 9) : startDate,
+    endDate: localTimeZone === "UTC" ? addHours(endDate, 9) : endDate,
   };
 }
 
@@ -74,10 +74,7 @@ function aggregateTransactions(
 
   const dailyAggregates: { [date: string]: AggregateDataType } = {};
   transactions.forEach((transaction) => {
-    const transactionDate = toZonedTime(
-      new Date(transaction.timestamp),
-      TIME_ZONE,
-    );
+    const transactionDate = new Date(transaction.timestamp);
 
     if (isWithinInterval(transactionDate, { start: startDate, end: endDate })) {
       const date = formatToKSTDate(transactionDate);
