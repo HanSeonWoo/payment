@@ -39,6 +39,9 @@
 
 <img width="360" src="https://github.com/user-attachments/assets/4d60f008-886e-43ba-887a-da44eecd5811">
 
+새로운 입출금 알림과 동시에
+새로운 입출금 내역임을 확인할 수 있도록 애니메이션 효과를 줬습니다.
+
 ### 로딩 시 스켈레톤 효과 적용
 
 <img width="360" src="https://github.com/user-attachments/assets/2a8416f2-677c-4416-85e7-8e398ffa04c1">
